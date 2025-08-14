@@ -43,8 +43,14 @@ export function LoginForm() {
             </div>
           </div>
           <div className="hidden md:flex flex-1 items-center justify-center bg-gray-100 rounded-r-lg">
-            <div className="w-40 h-40 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
-              <Image src="/54.png" alt="Illustration" width={160} height={160} className="w-full h-full object-cover ml-[-45px] mt-[48px]" />
+            <div className="w-40 h-40 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center transition-transform duration-500 ease-in-out hover:scale-x-[-1]">
+              <Image
+                src="/54.png"
+                alt="Illustration"
+                width={160}
+                height={160}
+                className="w-full h-full object-cover ml-[-45px] mt-[48px]"
+              />
             </div>
           </div>
         </Card>
@@ -82,8 +88,14 @@ export function LoginForm() {
           </form>
         </div>
         <div className="hidden md:flex flex-1 items-center justify-center bg-gray-100 rounded-r-lg">
-          <div className="w-40 h-40 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
-            <Image src="/54.png" alt="Illustration" width={160} height={160} className="w-full h-full object-cover ml-[-45px] mt-[48px]" />
+          <div className="w-40 h-40 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center transition-transform duration-500 ease-in-out hover:scale-x-[-1]">
+            <Image
+              src="/54.png"
+              alt="Illustration"
+              width={160}
+              height={160}
+              className="w-full h-full object-cover ml-[-45px] mt-[48px]"
+            />
           </div>
         </div>
       </Card>
