@@ -1,5 +1,7 @@
 export async function fetchAPI(endpoint: string, options: RequestInit = {}): Promise<Response> {
   try {
+    // Debug: Afficher la valeur de la variable d'environnement
+    console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
     const url = `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`;
 
     // Récupérer le token depuis sessionStorage ou cookies
@@ -41,6 +43,8 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}): Pro
 
 export async function fetchAPICandidate(endpoint: string, options: RequestInit = {}): Promise<Response> {
   try {
+    // Debug: Afficher la valeur de la variable d'environnement
+    console.log('NEXT_PUBLIC_API_URL (candidate):', process.env.NEXT_PUBLIC_API_URL);
     const url = `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`;
 
     // Récupérer le token candidat depuis sessionStorage ou cookies
@@ -82,6 +86,8 @@ export async function fetchAPICandidate(endpoint: string, options: RequestInit =
 
 export async function fetchWithoutAuth(endpoint: string, options: RequestInit = {}): Promise<Response> {
   try {
+    // Debug: Afficher la valeur de la variable d'environnement
+    console.log('NEXT_PUBLIC_API_URL (without auth):', process.env.NEXT_PUBLIC_API_URL);
     const url = `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`;
 
     // Ne pas définir de Content-Type par défaut si on envoie un FormData
@@ -114,6 +120,7 @@ export async function checkUserAuthentication(accessToken: string | null): Promi
   }
 
   try {
+    console.log('NEXT_PUBLIC_API_URL (check auth):', process.env.NEXT_PUBLIC_API_URL);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/check-auth`, {
       method: 'GET',
       headers: {
@@ -142,6 +149,7 @@ export async function checkUserAdmin(accessToken: string | null): Promise<boolea
   }
 
   try {
+    console.log('NEXT_PUBLIC_API_URL (check admin):', process.env.NEXT_PUBLIC_API_URL);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/profile`, {
       method: 'GET',
       headers: {

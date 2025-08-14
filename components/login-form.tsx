@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
-import { fetchWithoutAuth } from "@/lib/fetch"
+import { fetchWithoutAuth } from "@/lib/api-request-utils"
 import { Mail } from "lucide-react"
 
 export function LoginForm() {

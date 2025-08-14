@@ -11,6 +11,7 @@ const AuthCallback = () => {
         const state = urlParams.get('state');
 
         if (code) {
+            console.log('NEXT_PUBLIC_API_URL (azure callback):', process.env.NEXT_PUBLIC_API_URL);
             fetch(process.env.NEXT_PUBLIC_API_URL + '/users/login/azure/exchange', {
                 method: 'POST',
                 headers: {
