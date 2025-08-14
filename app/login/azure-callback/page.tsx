@@ -66,7 +66,7 @@ const AuthCallback = () => {
                                     document.cookie = updatedCookies.join('; ');
                                 }
 
-                                // Redirection vers l'URL spécifiée ou vers le dashboard par défaut
+                                // Redirection vers l&apos;URL spécifiée ou vers le dashboard par défaut
                                 const redirectUrl = storedRedirectUrl ? decodeURIComponent(storedRedirectUrl) : '/dashboard';
                                 window.location.href = redirectUrl;
                             } catch (error) {

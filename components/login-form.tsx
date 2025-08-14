@@ -3,7 +3,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { fetchWithoutAuth } from "@/lib/fetch"
 import { Mail } from "lucide-react"
 
@@ -25,7 +25,7 @@ export function LoginForm() {
       if (error instanceof Error && error.message.includes('404')) {
         setError("Candidat non trouvé")
       } else {
-        setError("Une erreur est survenue lors de l'envoi du lien")
+        setError("Une erreur est survenue lors de l&apos;envoi du lien")
       }
     }
   }

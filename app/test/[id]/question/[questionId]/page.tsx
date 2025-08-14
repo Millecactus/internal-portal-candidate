@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,7 +25,16 @@ export default function TestQuestionPage() {
     const questionId = params.questionId as string;
     const testResultId = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('sessionId') : null;
 
-    const [question, setQuestion] = useState<any>(null);
+    const [question, setQuestion] = useState<{
+        instruction: string;
+        textType?: string;
+        questionType?: string;
+        possibleResponses?: Array<{
+            _id?: string;
+            possibleResponse: string;
+        }>;
+        time?: number;
+    } | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [candidateResponse, setCandidateResponse] = useState<string>("");
@@ -35,7 +44,7 @@ export default function TestQuestionPage() {
     const [remainingTimeString, setRemainingTimeString] = useState<string>("");
 
     // Liste des langages disponibles
-    const codeLanguages = [
+    const codeLanguages = useMemo(() => [
         { label: 'PHP', value: 'php', extension: php },
         { label: 'JavaScript', value: 'javascript', extension: javascript },
         { label: 'TypeScript', value: 'typescript', extension: () => javascript({ typescript: true }) },
@@ -47,16 +56,16 @@ export default function TestQuestionPage() {
         { label: 'Markdown', value: 'markdown', extension: markdown },
         { label: 'C#', value: 'csharp', extension: csharp },
         { label: 'Dart', value: 'dart', extension: undefined }, // Pas d'extension officielle
-    ];
+    ], []);
     const [selectedLanguage, setSelectedLanguage] = useState('php');
 
-    // Trouver l'extension CodeMirror du langage sélectionné
+    // Trouver l&apos;extension CodeMirror du langage sélectionné
     const getLanguageExtension = useCallback(() => {
         const found = codeLanguages.find(l => l.value === selectedLanguage);
         return found && found.extension ? [found.extension()] : [];
-    }, [selectedLanguage]);
+    }, [selectedLanguage, codeLanguages]);
 
-    // Détection automatique du langage dans l'énoncé
+    // Détection automatique du langage dans l&apos;énoncé
     useEffect(() => {
         if (question && question.textType === 'code' && question.instruction) {
             // Liste des mots-clés et alias pour chaque langage
@@ -87,7 +96,35 @@ export default function TestQuestionPage() {
                 }
             }
         }
-    }, [question]);
+    }, [question, selectedLanguage]);
+
+    const handleSubmit = useCallback(async () => {
+        // Nettoyage du timer dans le localStorage
+        const storageKey = `timer_${testResultId}_${questionId}`;
+        localStorage.removeItem(storageKey);
+        try {
+            await fetchWithoutAuth(`/result/response`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ response: candidateResponse, questionId: questionId, testResultId: testResultId, testId: testId })
+            });
+
+            // Récupérer la prochaine question après la soumission
+            const nextQuestionRes = await fetchWithoutAuth(`/result/${testResultId}/nextQuestion?currentQuestionId=${questionId}`);
+            if (nextQuestionRes.ok) {
+                const data = await nextQuestionRes.json();
+                const nextQuestionId = data.nextQuestionId;
+
+                if (nextQuestionId === "result" || !nextQuestionId) {
+                    router.push(`/test/${testId}/result?sessionId=${testResultId}`);
+                } else {
+                    router.push(`/test/${testId}/question/${nextQuestionId}?sessionId=${testResultId}`);
+                }
+            }
+        } catch {
+            // Erreur silencieuse, ne rien afficher
+        }
+    }, [testResultId, questionId, candidateResponse, testId, router]);
 
     useEffect(() => {
         async function fetchQuestion() {
@@ -106,7 +143,7 @@ export default function TestQuestionPage() {
                     setRemainingTime(data.question.time || 0);
                     localStorage.setItem(storageKey, String(data.question.time || 0));
                 }
-            } catch (e) {
+            } catch {
                 setError("Impossible de charger la question");
             } finally {
                 setLoading(false);
@@ -149,7 +186,7 @@ export default function TestQuestionPage() {
             });
         }, 1000);
         return () => clearInterval(interval);
-    }, [remainingTime, loading, testResultId, questionId]);
+    }, [remainingTime, loading, testResultId, questionId, handleSubmit]);
 
     useEffect(() => {
         const minutes = Math.floor(remainingTime / 60).toString().padStart(2, '0');
@@ -157,15 +194,15 @@ export default function TestQuestionPage() {
         setRemainingTimeString(`${minutes}:${seconds}`);
     }, [remainingTime]);
 
-    // Fonction utilitaire pour rendre l'instruction avec KaTeX
+    // Fonction utilitaire pour rendre l&apos;instruction avec KaTeX
     function renderInstructionWithLatex(text: string) {
         if (!text) return text;
-        // On traite dans l'ordre : \[...\], \(...\), $$...$$, $...$
+        // On traite dans l&apos;ordre : \[...\], \(...\), $$...$$, $...$
         // \[...\] => display
         text = text.replace(/\\\[([\s\S]+?)\\\]/g, (match, formula) => {
             try {
                 return katex.renderToString(formula, { displayMode: true });
-            } catch (e) {
+            } catch {
                 return match;
             }
         });
@@ -173,7 +210,7 @@ export default function TestQuestionPage() {
         text = text.replace(/\\\(([\s\S]+?)\\\)/g, (match, formula) => {
             try {
                 return katex.renderToString(formula, { displayMode: false });
-            } catch (e) {
+            } catch {
                 return match;
             }
         });
@@ -181,7 +218,7 @@ export default function TestQuestionPage() {
         text = text.replace(/\$\$([\s\S]+?)\$\$/g, (match, formula) => {
             try {
                 return katex.renderToString(formula, { displayMode: true });
-            } catch (e) {
+            } catch {
                 return match;
             }
         });
@@ -189,40 +226,12 @@ export default function TestQuestionPage() {
         text = text.replace(/\$([\s\S]+?)\$/g, (match, formula) => {
             try {
                 return katex.renderToString(formula, { displayMode: false });
-            } catch (e) {
+            } catch {
                 return match;
             }
         });
         return text;
     }
-
-    const handleSubmit = async () => {
-        // Nettoyage du timer dans le localStorage
-        const storageKey = `timer_${testResultId}_${questionId}`;
-        localStorage.removeItem(storageKey);
-        try {
-            await fetchWithoutAuth(`/result/response`, {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ response: candidateResponse, questionId: questionId, testResultId: testResultId, testId: testId })
-            });
-
-            // Récupérer la prochaine question après la soumission
-            const nextQuestionRes = await fetchWithoutAuth(`/result/${testResultId}/nextQuestion?currentQuestionId=${questionId}`);
-            if (nextQuestionRes.ok) {
-                const data = await nextQuestionRes.json();
-                const nextQuestionId = data.nextQuestionId;
-
-                if (nextQuestionId === "result" || !nextQuestionId) {
-                    router.push(`/test/${testId}/result?sessionId=${testResultId}`);
-                } else {
-                    router.push(`/test/${testId}/question/${nextQuestionId}?sessionId=${testResultId}`);
-                }
-            }
-        } catch (e) {
-            // Erreur silencieuse, ne rien afficher
-        }
-    };
 
     if (loading) {
         return (
@@ -242,7 +251,7 @@ export default function TestQuestionPage() {
             router.replace(`/test/${testId}/result?sessionId=${testResultId}`);
             return null;
         }
-        // Sinon, afficher l'erreur (cas extrême)
+        // Sinon, afficher l&apos;erreur (cas extrême)
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <p className="text-red-500">{error || "Question introuvable"}</p>
@@ -262,7 +271,10 @@ export default function TestQuestionPage() {
                 </div>
                 {question.questionType === "MCQ" ? (
                     <div className="flex flex-col gap-4 mb-6">
-                        {question.possibleResponses?.map((resp: any, idx: number) => (
+                        {question.possibleResponses?.map((resp: {
+                            _id?: string;
+                            possibleResponse: string;
+                        }, idx: number) => (
                             <Button
                                 key={resp._id || idx}
                                 variant={candidateResponse === resp.possibleResponse ? "default" : "outline"}

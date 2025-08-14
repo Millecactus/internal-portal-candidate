@@ -17,14 +17,14 @@ export default function ResultPage() {
                     </div>
 
                     <p className="text-gray-600">
-                        Merci d'avoir complété ce test. Vos réponses ont été enregistrées avec succès.
+                        Merci d&apos;avoir complété ce test. Vos réponses ont été enregistrées avec succès.
                     </p>
 
                     <Button
                         onClick={() => router.push('/candidate')}
                         className="w-full"
                     >
-                        Retour à l'accueil
+                        Retour à l&apos;accueil
                     </Button>
                 </div>
             </div>

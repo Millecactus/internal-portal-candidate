@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
 import { fetchWithoutAuth } from '@/lib/api-request-utils'
 
-export default function CandidateCallbackPage() {
+function CandidateCallbackContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const token = searchParams.get('token')
@@ -60,18 +60,35 @@ export default function CandidateCallbackPage() {
     }, [token, router])
 
     return (
+        <div className="w-full max-w-md p-6 bg-white rounded-md shadow-md">
+            <h1 className="text-2xl font-bold mb-4">Vérification du lien...</h1>
+            {error && (
+                <div className="p-3 bg-red-100 text-red-700 rounded-md">
+                    {error}
+                </div>
+            )}
+            {!error && !token && (
+                <p>Chargement...</p>
+            )}
+        </div>
+    )
+}
+
+function LoadingFallback() {
+    return (
+        <div className="w-full max-w-md p-6 bg-white rounded-md shadow-md">
+            <h1 className="text-2xl font-bold mb-4">Vérification du lien...</h1>
+            <p>Chargement...</p>
+        </div>
+    )
+}
+
+export default function CandidateCallbackPage() {
+    return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
-            <div className="w-full max-w-md p-6 bg-white rounded-md shadow-md">
-                <h1 className="text-2xl font-bold mb-4">Vérification du lien...</h1>
-                {error && (
-                    <div className="p-3 bg-red-100 text-red-700 rounded-md">
-                        {error}
-                    </div>
-                )}
-                {!error && !token && (
-                    <p>Chargement...</p>
-                )}
-            </div>
+            <Suspense fallback={<LoadingFallback />}>
+                <CandidateCallbackContent />
+            </Suspense>
         </div>
     )
 } 

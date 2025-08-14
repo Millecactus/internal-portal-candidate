@@ -1,6 +1,3 @@
-import { hasPermission, hasRole, ROLES, PERMISSIONS } from "./roles-utils";
-
-
 export async function fetchAPI(endpoint: string, options: RequestInit = {}): Promise<Response> {
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`;
@@ -158,12 +155,8 @@ export async function checkUserAdmin(accessToken: string | null): Promise<boolea
       return false;
     }
 
-    const data = await response.json();
-    console.log("data", data);
-    const isAdmin = await hasRole(data, ROLES.ADMIN);
-    const hasAdminPermission = await hasPermission(data, PERMISSIONS.ADMIN_ACCESS);
-    console.log("isAdmin", isAdmin);
-    console.log("hasAdminPermission", hasAdminPermission);
+    const isAdmin = false;
+    const hasAdminPermission = false;
     return isAdmin && hasAdminPermission;
   } catch (error) {
     console.error('Error checking user admin:', error);

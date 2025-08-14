@@ -26,7 +26,7 @@ export default function Navbar() {
                 <Button asChild className="text-white">
                     <Link href="/jobs" className="flex items-center gap-2">
                         <Briefcase className="w-4 h-4" />
-                        Offres d'emploi
+                        Offres d&apos;emploi
                     </Link>
                 </Button>
             )}

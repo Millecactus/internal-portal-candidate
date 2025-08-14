@@ -15,19 +15,6 @@ export const PERMISSIONS = {
 
 export type Role = typeof ROLES[keyof typeof ROLES];
 
-interface User {
-    firstname: string;
-    roles: string[];  // Tableau de rôles hashés (MD5)
-    permissions: string[];  // Tableau de permissions hashées (MD5)
-}
-
-async function simpleHash(str: string, salt: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(str + salt);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
 
 /**
  * Vérifie si un utilisateur possède une permission spécifique
@@ -35,7 +22,7 @@ async function simpleHash(str: string, salt: string): Promise<string> {
  * @param permission - La permission à vérifier
  * @returns boolean indiquant si l'utilisateur possède la permission
  */
-export async function hasPermission(user: User, permission: string): Promise<boolean> {
+export async function hasPermission(): Promise<boolean> {
     /*if (!Array.isArray(user.permissions)) return false;
     const hashedPermission = await simpleHash(permission, user.firstname);
     return user.permissions.includes(hashedPermission);*/
@@ -48,7 +35,7 @@ export async function hasPermission(user: User, permission: string): Promise<boo
  * @param requiredRole - Rôle requis pour l'accès
  * @returns boolean indiquant si l'utilisateur possède le rôle requis
  */
-export async function hasRole(user: User, requiredRole: Role): Promise<boolean> {
+export async function hasRole(): Promise<boolean> {
     /*if (!Array.isArray(user.roles)) return false;
     const hashedRole = await simpleHash(requiredRole, user.firstname);
     console.log("hashedRole", hashedRole);
@@ -63,8 +50,6 @@ export async function hasRole(user: User, requiredRole: Role): Promise<boolean> 
  * @param requiredRoles - Tableau des rôles dont au moins un est requis
  * @returns boolean indiquant si l'utilisateur possède au moins un des rôles requis
  */
-export async function hasAnyRole(user: User, requiredRoles: Role[]): Promise<boolean> {
-    if (!Array.isArray(user.roles)) return false;
-    const roleChecks = await Promise.all(requiredRoles.map(role => hasRole(user, role)));
-    return roleChecks.some(hasRole => hasRole);
+export async function hasAnyRole(): Promise<boolean> {
+    return false;
 }

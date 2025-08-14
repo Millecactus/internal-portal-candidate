@@ -1,6 +1,5 @@
 "use client"
 import { LoginForm } from "@/components/login-form"
-import { checkUserAuthentication } from "@/lib/api-request-utils";
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // Utilisation de 'next/navigation' au lieu de 'next/router'

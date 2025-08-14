@@ -8,21 +8,7 @@ import Image from "next/image";
 import { Play } from "lucide-react";
 import { fetchWithoutAuth } from "@/lib/api-request-utils";
 
-interface TestCategory {
-    categoryId: string;
-    expertiseLevel: string;
-    categoryName: string;
-}
 
-interface Test {
-    _id: string;
-    title: string;
-    description: string;
-    categories: TestCategory[];
-    questions: { questionId: string; order: number }[];
-    targetJob: string;
-    seniorityLevel: string;
-}
 
 export default function TestInstructionsPage() {
     const router = useRouter();
@@ -30,7 +16,18 @@ export default function TestInstructionsPage() {
     const searchParams = useSearchParams();
     const testId = params.id as string;
     const testResultId = searchParams.get('sessionId');
-    const [test, setTest] = useState<any>(null);
+    const [test, setTest] = useState<{
+        title: string;
+        description: string;
+        questions?: Array<unknown>;
+        maxTime?: number;
+        targetJob?: string;
+        seniorityLevel?: string;
+        categories?: Array<{
+            categoryId: string;
+            categoryName?: string;
+        }>;
+    } | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isTestSubmitted, setIsTestSubmitted] = useState(false);
@@ -50,7 +47,7 @@ export default function TestInstructionsPage() {
                     const nextQuestionData = await nextQuestionRes.json();
                     setIsTestSubmitted(nextQuestionData.nextQuestionId === "result");
                 }
-            } catch (e) {
+            } catch {
                 setError("Impossible de charger le test");
             } finally {
                 setLoading(false);
@@ -69,7 +66,7 @@ export default function TestInstructionsPage() {
             if (nextQuestionId) {
                 router.push(`/test/${testId}/question/${nextQuestionId}?sessionId=${testResultId}`);
             }
-        } catch (e) {
+        } catch {
             alert("Impossible de démarrer le test");
         }
     };
@@ -110,14 +107,17 @@ export default function TestInstructionsPage() {
                             <p className="text-gray-600">Durée maximum : <b>{Math.round(test.maxTime / 60)} minutes</b></p>
                         )}
                         <p className="text-gray-600 mt-2">
-                            Poste visé : <b>{test.targetJob?.charAt(0).toUpperCase() + test.targetJob?.slice(1)}</b> - Niveau <b>{test.seniorityLevel?.charAt(0).toUpperCase() + test.seniorityLevel?.slice(1)}</b>
+                            Poste visé : <b>{test.targetJob ? test.targetJob.charAt(0).toUpperCase() + test.targetJob.slice(1) : 'Non spécifié'}</b> - Niveau <b>{test.seniorityLevel ? test.seniorityLevel.charAt(0).toUpperCase() + test.seniorityLevel.slice(1) : 'Non spécifié'}</b>
                         </p>
                         <p className="text-gray-600 mt-2">
                             Compétences visées :
                         </p>
                         {test.categories && test.categories.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-2">
-                                {test.categories.map((cat: any) => (
+                                {test.categories.map((cat: {
+                                    categoryId: string;
+                                    categoryName?: string;
+                                }) => (
                                     <span key={cat.categoryId} className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded">
                                         {cat.categoryName || cat.categoryId}
                                     </span>
@@ -130,7 +130,7 @@ export default function TestInstructionsPage() {
                     </p>
                     <ul className="list-disc pl-5 text-gray-700 mb-6">
                         <li>Vous devez réaliser ce test par vous-même.</li>
-                        <li>Assurez-vous d'être dans un endroit calme et stable.</li>
+                        <li>Assurez-vous d&apos;être dans un endroit calme et stable.</li>
                         <li>Le test doit être complété en une seule session.</li>
                     </ul>
                     <div className="flex justify-center mt-10">
@@ -141,7 +141,7 @@ export default function TestInstructionsPage() {
                                     onClick={() => router.push('/candidate')}
                                     variant="outline"
                                 >
-                                    Retour à l'accueil
+                                    Retour à l&apos;accueil
                                 </Button>
                             </div>
                         ) : (

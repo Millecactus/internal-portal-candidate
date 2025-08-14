@@ -234,7 +234,7 @@ export default function CandidatePage() {
                                 <CardHeader>
                                     <CardTitle>Mes candidatures</CardTitle>
                                     <CardDescription>
-                                        Suivez l'état de vos candidatures
+                                        Suivez l&apos;état de vos candidatures
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -268,7 +268,7 @@ export default function CandidatePage() {
                                 <CardHeader>
                                     <CardTitle>Tests techniques</CardTitle>
                                     <CardDescription>
-                                        Suivez l'état de vos tests techniques
+                                        Suivez l&apos;état de vos tests techniques
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>

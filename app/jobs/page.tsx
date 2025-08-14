@@ -1,9 +1,8 @@
 'use client'
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
 import Navbar from '@/components/navbar';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -44,8 +43,6 @@ interface JobsResponse {
 }
 
 export default function JobsPage() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
     const [jobs, setJobs] = useState<Job[]>([]);
     const [pagination, setPagination] = useState<Pagination | null>(null);
     const [loading, setLoading] = useState(true);
@@ -60,7 +57,7 @@ export default function JobsPage() {
         limit: 10
     });
 
-    const fetchJobs = async () => {
+    const fetchJobs = useCallback(async () => {
         try {
             setLoading(true);
             const queryParams = new URLSearchParams({
@@ -84,11 +81,11 @@ export default function JobsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [filters]);
 
     useEffect(() => {
         fetchJobs();
-    }, [filters]);
+    }, [filters, fetchJobs]);
 
     const handleFilterChange = (key: string, value: string) => {
         setFilters(prev => ({
@@ -233,7 +230,7 @@ export default function JobsPage() {
                                     <div className="flex items-center">
                                         <Link href={`/jobs/${job._id}`}>
                                             <Button variant="outline" className="whitespace-nowrap">
-                                                Voir l'offre
+                                                Voir l&apos;offre
                                             </Button>
                                         </Link>
                                     </div>
