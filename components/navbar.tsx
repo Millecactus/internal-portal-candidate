@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
+import { User, Briefcase } from 'lucide-react';
 
 export default function Navbar() {
     const pathname = usePathname();
@@ -14,9 +15,19 @@ export default function Navbar() {
             <Link href="/" className="flex items-center">
                 <Image src="/01.png" alt="Logo Programisto" width={165} height={30} className="w-[165px] h-[30px]" />
             </Link>
-            {!isCandidatePage && (
-                <Button asChild className="text-black">
-                    <Link href="/login" className="">Espace candidat</Link>
+            {!isCandidatePage ? (
+                <Button asChild className="text-white">
+                    <Link href="/login" className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        Espace candidat
+                    </Link>
+                </Button>
+            ) : (
+                <Button asChild className="text-white">
+                    <Link href="/jobs" className="flex items-center gap-2">
+                        <Briefcase className="w-4 h-4" />
+                        Offres d'emploi
+                    </Link>
                 </Button>
             )}
         </nav>

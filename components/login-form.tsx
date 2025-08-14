@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { fetchWithoutAuth } from "@/lib/fetch"
+import { Mail } from "lucide-react"
 
 export function LoginForm() {
   const [email, setEmail] = useState("")
@@ -33,9 +34,18 @@ export function LoginForm() {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center" style={{ background: '#f8fafb' }}>
         <Image src="/01.png" alt="Logo Programisto" width={240} height={80} className="mb-8" />
-        <Card className="flex w-full max-w-3xl p-12 shadow-lg">
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <h2 className="text-2xl font-bold mb-4">Lien de connexion envoyé par mail</h2>
+        <Card className="flex w-full max-w-3xl p-0 shadow-lg">
+          <div className="flex-1 flex flex-col justify-center p-12">
+            <div className="flex flex-col items-center text-center">
+              <h2 className="text-2xl font-bold mb-4">Lien de connexion envoyé par mail</h2>
+              <Mail className="w-16 h-16 text-green-500 mb-4" />
+              <p className="text-muted-foreground">Vérifiez votre boîte mail et cliquez sur le lien pour vous connecter</p>
+            </div>
+          </div>
+          <div className="hidden md:flex flex-1 items-center justify-center bg-gray-100 rounded-r-lg">
+            <div className="w-40 h-40 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
+              <Image src="/54.png" alt="Illustration" width={160} height={160} className="w-full h-full object-cover ml-[-45px] mt-[48px]" />
+            </div>
           </div>
         </Card>
       </div>
@@ -65,7 +75,8 @@ export function LoginForm() {
             {error && (
               <p className="text-red-500 text-sm">{error}</p>
             )}
-            <Button type="submit" className="w-full text-black">
+            <Button type="submit" className="w-full text-white flex items-center gap-2">
+              <Mail className="w-4 h-4" />
               Recevoir un lien magique
             </Button>
           </form>

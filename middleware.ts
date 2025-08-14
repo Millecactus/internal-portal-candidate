@@ -16,6 +16,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/register') || // Le callback Azure 
     pathname.startsWith('/candidate-callback') || // Le callback de candidat
     pathname.startsWith('/candidate') || // La page candidate
+    pathname.startsWith('/test') || // Les pages de test (authentification via sessionId)
     pathname.endsWith('.ico') || pathname.endsWith('.png') || pathname.endsWith('.jpg') || pathname.endsWith('.jpeg') || pathname.endsWith('.gif') || pathname.endsWith('.svg') || pathname.endsWith('.css') || pathname.endsWith('.js')
   ) {
     return NextResponse.next();
@@ -48,5 +49,5 @@ export async function middleware(request: NextRequest) {
 
 // 🔥 Configuration du matcher pour exclure certaines routes
 export const config = {
-  matcher: '/((?!_next|static|api|login|login/azure-callback|candidate-callback|candidate).*)',
+  matcher: '/((?!_next|static|api|login|login/azure-callback|candidate-callback|candidate|test).*)',
 };
