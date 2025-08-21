@@ -1,13 +1,21 @@
 "use client"
 import { LoginForm } from "@/components/login-form"
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // Utilisation de 'next/navigation' au lieu de 'next/router'
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation'; // Utilisation de 'next/navigation' au lieu de 'next/router'
 
 export default function Page() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [initialEmail, setInitialEmail] = useState<string>("");
 
   useEffect(() => {
+    // Récupérer le paramètre email depuis l'URL
+    const emailParam = searchParams.get('email');
+    if (emailParam) {
+      setInitialEmail(emailParam);
+    }
+
     let accessToken = null;
     try {
       accessToken = sessionStorage.getItem('accessToken');
@@ -20,13 +28,11 @@ export default function Page() {
       accessToken = cookieToken || null;
     }
 
-
-
-  }, [router]);
+  }, [router, searchParams]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center px-4">
-      <LoginForm />
+      <LoginForm initialEmail={initialEmail} />
     </div>
   );
 }

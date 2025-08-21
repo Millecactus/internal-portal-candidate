@@ -2,15 +2,26 @@
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { fetchWithoutAuth } from "@/lib/api-request-utils"
 import { Mail } from "lucide-react"
 
-export function LoginForm() {
-  const [email, setEmail] = useState("")
+interface LoginFormProps {
+  initialEmail?: string;
+}
+
+export function LoginForm({ initialEmail = "" }: LoginFormProps) {
+  const [email, setEmail] = useState(initialEmail)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Mettre à jour l'email si initialEmail change
+  useEffect(() => {
+    if (initialEmail) {
+      setEmail(initialEmail);
+    }
+  }, [initialEmail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
