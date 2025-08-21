@@ -17,7 +17,7 @@ export default function Navbar() {
             </Link>
             {!isCandidatePage ? (
                 <Button asChild className="text-white">
-                    <Link href="/login" className="flex items-center gap-2">
+                    <Link href="/candidate" className="flex items-center gap-2">
                         <User className="w-4 h-4" />
                         Espace candidat
                     </Link>
