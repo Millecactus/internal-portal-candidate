@@ -313,7 +313,7 @@ export default function CandidatePage() {
                                                                         <span className="font-bold">{Math.ceil((result.score / result.maxScore) * 100)}%</span>
                                                                     </span>
                                                                     <span className="block text-xs text-gray-500">
-                                                                        ({result.score} / {result.maxScore} pts)
+                                                                        ({Math.round(result.score)} / {result.maxScore} pts)
                                                                     </span>
                                                                 </div>
                                                             )}
