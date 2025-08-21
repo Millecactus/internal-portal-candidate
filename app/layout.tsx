@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Head from 'next/head';
 import ClarityBlock from '../components/clarity';
+import GoogleAnalytics from '../components/google-analytics';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ClarityBlock projectId={process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID || ''} />
+        <GoogleAnalytics trackingId="G-GKNWBXRCTF" />
         {children}
       </body>
     </html >
