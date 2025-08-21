@@ -20,6 +20,7 @@ export default function TestInstructionsPage() {
         title: string;
         description: string;
         questions?: Array<unknown>;
+        numberOfQuestions?: number;
         maxTime?: number;
         targetJob?: string;
         seniorityLevel?: string;
@@ -100,8 +101,8 @@ export default function TestInstructionsPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="mb-4">
-                        {test.questions && (
-                            <p className="font-medium">Ce test comporte <b>{test.questions.length}</b> questions.</p>
+                        {(test.numberOfQuestions || test.questions) && (
+                            <p className="font-medium">Ce test comporte <b>{test.numberOfQuestions || test.questions?.length}</b> questions.</p>
                         )}
                         {test.maxTime && (
                             <p className="text-gray-600">Durée maximum : <b>{Math.round(test.maxTime / 60)} minutes</b></p>

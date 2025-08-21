@@ -35,6 +35,8 @@ export default function TestQuestionPage() {
         }>;
         time?: number;
     } | null>(null);
+    const [numberOfQuestions, setNumberOfQuestions] = useState<number>(0);
+    const [questionPosition, setQuestionPosition] = useState<number>(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [candidateResponse, setCandidateResponse] = useState<string>("");
@@ -134,6 +136,8 @@ export default function TestQuestionPage() {
                 if (!res.ok) throw new Error("Erreur lors de la récupération de la question");
                 const data = await res.json();
                 setQuestion(data.question);
+                setNumberOfQuestions(data.numberOfQuestions);
+                setQuestionPosition(data.questionPosition);
                 // Gestion du timer persistant
                 const storageKey = `timer_${testResultId}_${questionId}`;
                 const saved = localStorage.getItem(storageKey);
@@ -263,7 +267,9 @@ export default function TestQuestionPage() {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <Card className="w-full max-w-2xl mx-4 p-8">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold">Question</h2>
+                    <h2 className="text-xl font-bold">
+                        Question {questionPosition > 0 && numberOfQuestions > 0 ? `${questionPosition}/${numberOfQuestions}` : ''}
+                    </h2>
                     <span className="text-gray-600">Temps restant : {remainingTimeString}</span>
                 </div>
                 <div className="mb-6">
