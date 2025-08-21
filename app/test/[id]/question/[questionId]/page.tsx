@@ -278,7 +278,7 @@ export default function TestQuestionPage() {
                             <Button
                                 key={resp._id || idx}
                                 variant={candidateResponse === resp.possibleResponse ? "default" : "outline"}
-                                className="w-full"
+                                className="w-full text-left justify-start whitespace-normal h-auto min-h-[44px] py-3 px-4"
                                 onClick={() => setCandidateResponse(resp.possibleResponse)}
                             >
                                 {resp.possibleResponse}
