@@ -1,10 +1,10 @@
 "use client"
 import { LoginForm } from "@/components/login-form"
-
+import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation'; // Utilisation de 'next/navigation' au lieu de 'next/router'
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function Page() {
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [initialEmail, setInitialEmail] = useState<string>("");
@@ -34,5 +34,20 @@ export default function Page() {
     <div className="flex h-screen w-full items-center justify-center px-4">
       <LoginForm initialEmail={initialEmail} />
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-screen w-full items-center justify-center px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p>Chargement...</p>
+        </div>
+      </div>
+    }>
+      <LoginPageContent />
+    </Suspense>
   );
 }
