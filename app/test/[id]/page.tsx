@@ -8,7 +8,34 @@ import Image from "next/image";
 import { Play } from "lucide-react";
 import { fetchWithoutAuth } from "@/lib/api-request-utils";
 
+const SENIORITY_OPTIONS = [
+    { label: "Étudiant", value: "student" },
+    { label: "Junior", value: "junior" },
+    { label: "Intermédiaire", value: "intermediate" },
+    { label: "Senior", value: "senior" },
+];
 
+const EXPERTISE_LEVELS = [
+    { label: "Débutant", value: "beginner" },
+    { label: "Intermédiaire", value: "intermediate" },
+    { label: "Avancé", value: "advanced" },
+];
+
+// Fonction pour convertir le niveau de séniorité en français
+const getSeniorityLabel = (seniorityLevel: string | undefined): string => {
+    if (!seniorityLevel) return 'Non spécifié';
+
+    const option = SENIORITY_OPTIONS.find(opt => opt.value === seniorityLevel.toLowerCase());
+    return option ? option.label : seniorityLevel.charAt(0).toUpperCase() + seniorityLevel.slice(1);
+};
+
+// Fonction pour convertir le niveau d'expertise en français
+const getExpertiseLabel = (expertiseLevel: string | undefined): string => {
+    if (!expertiseLevel) return '';
+
+    const option = EXPERTISE_LEVELS.find(opt => opt.value === expertiseLevel.toLowerCase());
+    return option ? option.label : expertiseLevel.charAt(0).toUpperCase() + expertiseLevel.slice(1);
+};
 
 export default function TestInstructionsPage() {
     const router = useRouter();
@@ -23,10 +50,12 @@ export default function TestInstructionsPage() {
         numberOfQuestions?: number;
         maxTime?: number;
         targetJob?: string;
+        targetJobName?: string;
         seniorityLevel?: string;
         categories?: Array<{
             categoryId: string;
             categoryName?: string;
+            expertiseLevel?: string;
         }>;
     } | null>(null);
     const [loading, setLoading] = useState(true);
@@ -108,7 +137,7 @@ export default function TestInstructionsPage() {
                             <p className="text-gray-600">Durée maximum : <b>{Math.round(test.maxTime / 60)} minutes</b></p>
                         )}
                         <p className="text-gray-600 mt-2">
-                            Poste visé : <b>{test.targetJob ? test.targetJob.charAt(0).toUpperCase() + test.targetJob.slice(1) : 'Non spécifié'}</b> - Niveau <b>{test.seniorityLevel ? test.seniorityLevel.charAt(0).toUpperCase() + test.seniorityLevel.slice(1) : 'Non spécifié'}</b>
+                            Poste visé : <b>{test.targetJobName ? test.targetJobName : test.targetJob ? test.targetJob.charAt(0).toUpperCase() + test.targetJob.slice(1) : 'Non spécifié'}</b> - Niveau <b>{test.seniorityLevel ? getSeniorityLabel(test.seniorityLevel) : 'Non spécifié'}</b>
                         </p>
                         <p className="text-gray-600 mt-2">
                             Compétences visées :
@@ -118,9 +147,10 @@ export default function TestInstructionsPage() {
                                 {test.categories.map((cat: {
                                     categoryId: string;
                                     categoryName?: string;
+                                    expertiseLevel?: string;
                                 }) => (
                                     <span key={cat.categoryId} className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded">
-                                        {cat.categoryName || cat.categoryId}
+                                        {cat.categoryName || cat.categoryId}{cat.expertiseLevel ? ` - ${getExpertiseLabel(cat.expertiseLevel)}` : ''}
                                     </span>
                                 ))}
                             </div>
