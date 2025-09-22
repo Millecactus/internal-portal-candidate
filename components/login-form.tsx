@@ -36,7 +36,7 @@ export function LoginForm({ initialEmail = "" }: LoginFormProps) {
       if (error instanceof Error && error.message.includes('404')) {
         setError("Candidat non trouvé")
       } else {
-        setError("Une erreur est survenue lors de l&apos;envoi du lien")
+        setError("Une erreur est survenue lors de l'envoi du lien")
       }
     }
   }

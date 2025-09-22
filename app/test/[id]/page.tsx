@@ -161,7 +161,8 @@ export default function TestInstructionsPage() {
                     </p>
                     <ul className="list-disc pl-5 text-gray-700 mb-6">
                         <li>Vous devez réaliser ce test par vous-même.</li>
-                        <li>Assurez-vous d&apos;être dans un endroit calme et stable.</li>
+                        {/* eslint-disable-next-line react/no-unescaped-entities */}
+                        <li>Assurez-vous d'être dans un endroit calme et stable.</li>
                         <li>Le test doit être complété en une seule session.</li>
                     </ul>
                     <div className="flex justify-center mt-10">
@@ -172,7 +173,8 @@ export default function TestInstructionsPage() {
                                     onClick={() => router.push('/candidate')}
                                     variant="outline"
                                 >
-                                    Retour à l&apos;accueil
+                                    {/* eslint-disable-next-line react/no-unescaped-entities */}
+                                    Retour à l'accueil
                                 </Button>
                             </div>
                         ) : (

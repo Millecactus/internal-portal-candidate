@@ -230,7 +230,8 @@ export default function JobsPage() {
                                     <div className="flex items-center">
                                         <Link href={`/jobs/${job._id}`}>
                                             <Button variant="outline" className="whitespace-nowrap">
-                                                Voir l&apos;offre
+                                                {/* eslint-disable-next-line react/no-unescaped-entities */}
+                                                Voir l'offre
                                             </Button>
                                         </Link>
                                     </div>

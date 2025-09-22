@@ -37,7 +37,7 @@ export const RegisterForm: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.email.endsWith('@programisto.fr')) {
-            alert('L&apos;email doit se terminer par @programisto.fr');
+            alert('L\'email doit se terminer par @programisto.fr');
             return;
         }
         try {
@@ -50,7 +50,7 @@ export const RegisterForm: React.FC = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Erreur lors de l&apos;enregistrement');
+                throw new Error('Erreur lors de l\'enregistrement');
             } else {
                 router.push('/login');
             }
@@ -58,7 +58,7 @@ export const RegisterForm: React.FC = () => {
 
         } catch (error) {
             console.error('Erreur:', error);
-            alert('Une erreur est survenue lors de l&apos;inscription.');
+            alert('Une erreur est survenue lors de l\'inscription.');
         }
     };
 
@@ -139,7 +139,8 @@ export const RegisterForm: React.FC = () => {
                 type="submit"
                 className="w-full py-2 px-4 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700"
             >
-                S&apos;inscrire
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
+                S'inscrire
             </button>
         </form>
     );

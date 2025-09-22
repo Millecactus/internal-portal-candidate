@@ -17,14 +17,16 @@ export default function ResultPage() {
                     </div>
 
                     <p className="text-gray-600">
-                        Merci d&apos;avoir complété ce test. Vos réponses ont été enregistrées avec succès.
+                        {/* eslint-disable-next-line react/no-unescaped-entities */}
+                        Merci d'avoir complété ce test. Vos réponses ont été enregistrées avec succès.
                     </p>
 
                     <Button
                         onClick={() => router.push('/candidate')}
                         className="w-full"
                     >
-                        Retour à l&apos;accueil
+                        {/* eslint-disable-next-line react/no-unescaped-entities */}
+                        Retour à l'accueil
                     </Button>
                 </div>
             </div>

@@ -61,13 +61,13 @@ export default function TestQuestionPage() {
     ], []);
     const [selectedLanguage, setSelectedLanguage] = useState('php');
 
-    // Trouver l&apos;extension CodeMirror du langage sélectionné
+    // Trouver l'extension CodeMirror du langage sélectionné
     const getLanguageExtension = useCallback(() => {
         const found = codeLanguages.find(l => l.value === selectedLanguage);
         return found && found.extension ? [found.extension()] : [];
     }, [selectedLanguage, codeLanguages]);
 
-    // Détection automatique du langage dans l&apos;énoncé
+    // Détection automatique du langage dans l'énoncé
     useEffect(() => {
         if (question && question.textType === 'code' && question.instruction) {
             // Liste des mots-clés et alias pour chaque langage
@@ -198,10 +198,10 @@ export default function TestQuestionPage() {
         setRemainingTimeString(`${minutes}:${seconds}`);
     }, [remainingTime]);
 
-    // Fonction utilitaire pour rendre l&apos;instruction avec KaTeX
+    // Fonction utilitaire pour rendre l'instruction avec KaTeX
     function renderInstructionWithLatex(text: string) {
         if (!text) return text;
-        // On traite dans l&apos;ordre : \[...\], \(...\), $$...$$, $...$
+        // On traite dans l'ordre : \[...\], \(...\), $$...$$, $...$
         // \[...\] => display
         text = text.replace(/\\\[([\s\S]+?)\\\]/g, (match, formula) => {
             try {
@@ -255,7 +255,7 @@ export default function TestQuestionPage() {
             router.replace(`/test/${testId}/result?sessionId=${testResultId}`);
             return null;
         }
-        // Sinon, afficher l&apos;erreur (cas extrême)
+        // Sinon, afficher l'erreur (cas extrême)
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <p className="text-red-500">{error || "Question introuvable"}</p>

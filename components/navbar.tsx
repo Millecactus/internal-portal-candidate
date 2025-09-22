@@ -12,7 +12,7 @@ export default function Navbar() {
 
     return (
         <nav className="w-full flex items-center justify-between px-4 py-4 border-b bg-background shadow-sm">
-            <Link href="/" className="flex items-center">
+            <Link href="https://programisto.fr" className="flex items-center">
                 <Image src="/01.png" alt="Logo Programisto" width={165} height={30} className="w-[165px] h-[30px]" />
             </Link>
             {!isCandidatePage ? (
@@ -26,7 +26,8 @@ export default function Navbar() {
                 <Button asChild className="text-white">
                     <Link href="/jobs" className="flex items-center gap-2">
                         <Briefcase className="w-4 h-4" />
-                        Offres d&apos;emploi
+                        {/* eslint-disable-next-line react/no-unescaped-entities */}
+                        Offres d'emploi
                     </Link>
                 </Button>
             )}

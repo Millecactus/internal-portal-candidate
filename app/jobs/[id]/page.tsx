@@ -184,7 +184,8 @@ export default function JobDetailPage() {
 
                     <Card className={`pt-0 px-8 ${isVideosExpanded ? 'pb-8' : 'pb-0'} mb-6`}>
                         <div className={`flex justify-between items-center -mx-8 px-8 py-3 bg-gray-100 rounded-t-md ${isVideosExpanded ? 'mb-8' : 'mb-0'}`}>
-                            <h2 className="text-2xl font-bold">Envie d&apos;en savoir plus ?</h2>
+                            {/* eslint-disable-next-line react/no-unescaped-entities */}
+                            <h2 className="text-2xl font-bold">Envie d'en savoir plus ?</h2>
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -211,13 +212,14 @@ export default function JobDetailPage() {
                     {/* Bloc FAQ */}
                     <Card className="pt-0 px-8 pb-8 mb-6">
                         <div className="-mx-8 px-8 py-3 bg-gray-100 rounded-t-md mb-8">
-                            <h2 className="text-xl font-bold">QUESTIONS ET RÉPONSES SUR L&apos;OFFRE</h2>
+                            {/* eslint-disable-next-line react/no-unescaped-entities */}
+                            <h2 className="text-xl font-bold">QUESTIONS ET RÉPONSES SUR L'OFFRE</h2>
                         </div>
                         <div className="divide-y divide-gray-200">
                             {[
                                 {
-                                    question: "L&apos;envoi d&apos;un CV est-il obligatoire pour postuler à cette offre ?",
-                                    answer: "Pour postuler à cette offre, l&apos;envoi de votre CV est obligatoire."
+                                    question: "L'envoi d'un CV est-il obligatoire pour postuler à cette offre ?",
+                                    answer: "Pour postuler à cette offre, l'envoi de votre CV est obligatoire."
                                 },
                                 {
                                     question: "Le télétravail est-il possible pour ce poste ?",
@@ -434,7 +436,8 @@ export default function JobDetailPage() {
                     </Card>
                     <Card className={`bg-white rounded-xl pt-0 px-6 ${isEntrepriseExpanded ? 'pb-6' : 'pb-0'} mb-4`}>
                         <div className={`flex justify-between items-center -mx-6 px-6 py-3 bg-gray-100 rounded-t-md ${isEntrepriseExpanded ? 'mb-6' : 'mb-0'}`}>
-                            <h2 className="text-xl font-bold">L&apos;entreprise</h2>
+                            {/* eslint-disable-next-line react/no-unescaped-entities */}
+                            <h2 className="text-xl font-bold">L'entreprise</h2>
                             <Button
                                 variant="ghost"
                                 size="sm"
