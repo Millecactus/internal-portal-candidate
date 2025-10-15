@@ -1,19 +1,19 @@
 "use client"
-import { useEffect, useState, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
 import Navbar from '@/components/navbar';
-import { Card, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
-import { fetchWithoutAuth } from '@/lib/api-request-utils';
-import { MapPin, GraduationCap, Euro, ArrowRight, Upload, ChevronDown, Linkedin, Facebook, Instagram } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
+import { Card, CardContent, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from "@/components/ui/textarea";
+import { fetchWithoutAuth } from '@/lib/api-request-utils';
+import { ArrowRight, ChevronDown, Euro, Facebook, GraduationCap, Instagram, Linkedin, MapPin, Upload } from 'lucide-react';
 import Image from 'next/image';
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 interface Job {
     _id: string;
@@ -32,6 +32,9 @@ interface Job {
     maxSalary?: number;
 }
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
+
 export default function JobDetailPage() {
     const params = useParams();
     const router = useRouter();
@@ -49,6 +52,7 @@ export default function JobDetailPage() {
     const locauxPhotos = Array.from({ length: 13 }, (_, i) => `/photos_locaux/photo_locaux${i + 1}.jpg`);
     const [isPhotosExpanded, setIsPhotosExpanded] = useState(true);
     const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
+    const [errors, setErrors] = useState<{[key: string]: string | null}>({});
     const formRef = useRef<HTMLFormElement>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,6 +70,34 @@ export default function JobDetailPage() {
 
     const removeFile = (index: number) => {
         setFiles(prev => prev.filter((_, i) => i !== index));
+    };
+
+    // Fonction pour valider les champs du formulaire
+    const validateField = (name: string, value: string) => {
+        switch (name) {
+            case 'email':
+                if (!value) return 'L\'email est obligatoire';
+                if (!emailRegex.test(value)) return 'Format d\'email invalide (ex: test@test.com)';
+                return null;
+            case 'phone':
+                if (!value) return 'Le téléphone est obligatoire';
+                if (!phoneRegex.test(value)) return 'Format de téléphone invalide (ex: 06 06 06 06 06)';
+                return null;
+            case 'firstName':
+                if (!value) return 'Le prénom est obligatoire';
+                return null;
+            case 'lastName':
+                if (!value) return 'Le nom est obligatoire';
+                return null;
+            default:
+                return null;
+        }
+    };
+
+    // Fonction pour gérer les changements des champs du formulaire
+    const handleFieldChange = (name: string, value: string) => {
+        const error = validateField(name, value);
+        setErrors(prev => ({ ...prev, [name]: error }));
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -340,20 +372,36 @@ export default function JobDetailPage() {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <Label htmlFor="firstName">Prénom</Label>
-                                                <Input id="firstName" required />
+                                                <Input id="firstName" required
+                                                onBlur={(e) => handleFieldChange('firstName', e.target.value)}
+                                                onChange={(e) => handleFieldChange('firstName', e.target.value)}
+                                                />
+                                                {errors.firstName && <span className="text-red-500 text-sm">{errors.firstName}</span>}
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="lastName">Nom</Label>
-                                                <Input id="lastName" required />
+                                                <Input id="lastName" required
+                                                onBlur={(e) => handleFieldChange('lastName', e.target.value)}
+                                                onChange={(e) => handleFieldChange('lastName', e.target.value)}
+                                                />
+                                                {errors.lastName && <span className="text-red-500 text-sm">{errors.lastName}</span>}
                                             </div>
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="email">Email</Label>
-                                            <Input id="email" type="email" required />
+                                            <Input id="email" type="email" required 
+                                            onBlur={(e) => handleFieldChange('email', e.target.value)}
+                                            onChange={(e) => handleFieldChange('email', e.target.value)}
+                                            />
+                                            {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="phone">Téléphone</Label>
-                                            <Input id="phone" type="tel" required />
+                                            <Input id="phone" type="tel" required
+                                            onBlur={(e) => handleFieldChange('phone', e.target.value)}
+                                            onChange={(e) => handleFieldChange('phone', e.target.value)}
+                                            />
+                                            {errors.phone && <span className="text-red-500 text-sm">{errors.phone}</span>}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="linkedin">Lien LinkedIn</Label>

@@ -1,7 +1,7 @@
 'use client'
-import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { fetchWithoutAuth, checkUserAuthentication } from '../lib/api-request-utils';
+import React, { useEffect, useState } from 'react';
+import { checkUserAuthentication, fetchWithoutAuth } from '../lib/api-request-utils';
 
 export const RegisterForm: React.FC = () => {
     const [formData, setFormData] = useState({

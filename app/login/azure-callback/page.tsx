@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import { fetchAPI } from '@/lib/api-request-utils';
+import { useEffect } from 'react';
 
 
 const AuthCallback = () => {
@@ -41,8 +41,16 @@ const AuthCallback = () => {
                                 document.cookie = `accessToken=${accessToken}; path=/;`;
                                 document.cookie = `refreshToken=${refreshToken}; path=/;`;
 
-                                const profileResponse = await fetchAPI('/users/profile');
-
+                                // Tenter de récupérer le profil. Si échec, tenter de créer le Contact manquant puis réessayer.
+                                let profileResponse = await fetchAPI('/users/profile');
+                                if (!profileResponse.ok) {
+                                    try {
+                                        await fetchAPI('/users/ensure-contact', { method: 'POST' });
+                                        profileResponse = await fetchAPI('/users/profile');
+                                    } catch (e) {
+                                       console.error('Failed to fetch user profile', e); // Ignorer et laisser la gestion d'erreur ci-dessous rediriger si besoin
+                                    }
+                                }
                                 if (!profileResponse.ok) {
                                     throw new Error('Failed to fetch user profile');
                                 }
