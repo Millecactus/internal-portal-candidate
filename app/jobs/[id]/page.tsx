@@ -32,6 +32,7 @@ interface Job {
     maxSalary?: number;
 }
 
+
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
 
@@ -43,6 +44,8 @@ export default function JobDetailPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState<{[key: string]: number}>({});
+    const [uploadStatus, setUploadStatus] = useState<string>('');
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
     const [isEntrepriseExpanded, setIsEntrepriseExpanded] = useState(true);
     const [isVideosExpanded, setIsVideosExpanded] = useState(true);
@@ -100,34 +103,191 @@ export default function JobDetailPage() {
         setErrors(prev => ({ ...prev, [name]: error }));
     };
 
+    // Fonction pour uploader un fichier vers S3
+    const uploadFileToS3 = async (file: File, fileIndex: number): Promise<string> => {
+        const fileKey = `${fileIndex}-${file.name}`;
+        
+        try {
+            setUploadStatus(`Initialisation de l'upload de ${file.name}...`);
+            setUploadProgress(prev => ({ ...prev, [fileKey]: 10 }));
+
+            // Étape 1: Initialiser l'upload
+            console.log('🚀 Initialisation de l\'upload pour:', file.name);
+            console.log('📊 Données envoyées:', {
+                filename: file.name,
+                contentType: file.type,
+                size: file.size
+            });
+
+            const initResponse = await fetchWithoutAuth('/edrm-storage/files/init', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    originalName: file.name,
+                    mimeType: file.type,
+                    size: file.size,
+                    tenantId: "endurance-internal",
+                    entityName: "job-application",
+                    entityId: `application-${Date.now()}`
+                })
+            });
+
+            console.log('📡 Réponse init:', {
+                status: initResponse.status,
+                statusText: initResponse.statusText,
+                ok: initResponse.ok
+            });
+
+            if (!initResponse.ok) {
+                const errorText = await initResponse.text();
+                console.error('❌ Erreur init:', errorText);
+                throw new Error(`Erreur lors de l'initialisation de l'upload: ${initResponse.status} - ${errorText}`);
+            }
+
+            const initData = await initResponse.json();
+            console.log('🔍 Structure complète de initData:', JSON.stringify(initData, null, 2));
+            console.log('✅ Données init reçues:', initData);
+            const { fileId, presignedUrl } = initData.data || initData;
+
+            console.log('📋 fileId extrait:', fileId);
+            console.log('📋 presignedUrl extrait:', presignedUrl);
+            setUploadStatus(`Upload de ${file.name} vers S3...`);
+            setUploadProgress(prev => ({ ...prev, [fileKey]: 50 }));
+
+            // Étape 2: Upload direct vers S3
+            console.log('☁️ Upload vers S3:', presignedUrl);
+            if (!presignedUrl) {
+                throw new Error('URL d\'upload S3 non fournie par l\'API');
+            }
+            const uploadResponse = await fetch(presignedUrl, {
+                method: 'PUT',
+                body: file,
+                headers: {
+                    'Content-Type': file.type,
+                }
+            });
+
+            console.log('📡 Réponse S3:', {
+                status: uploadResponse.status,
+                statusText: uploadResponse.statusText,
+                ok: uploadResponse.ok
+            });
+
+            if (!uploadResponse.ok) {
+                const errorText = await uploadResponse.text();
+                console.error('❌ Erreur S3:', errorText);
+                throw new Error(`Erreur lors de l'upload vers S3: ${uploadResponse.status} - ${errorText}`);
+            }
+
+            setUploadStatus(`Finalisation de l'upload de ${file.name}...`);
+            setUploadProgress(prev => ({ ...prev, [fileKey]: 80 }));
+
+            // Étape 3: Finaliser l'upload
+            console.log('✅ Finalisation de l\'upload pour fileId:', fileId);
+            if (!fileId) {
+                throw new Error('ID de fichier non fourni par l\'API');
+            }
+            const completeResponse = await fetchWithoutAuth(`/edrm-storage/files/${fileId}/complete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            console.log('📡 Réponse complete:', {
+                status: completeResponse.status,
+                statusText: completeResponse.statusText,
+                ok: completeResponse.ok
+            });
+
+            if (!completeResponse.ok) {
+                const errorText = await completeResponse.text();
+                console.error('❌ Erreur complete:', errorText);
+                throw new Error(`Erreur lors de la finalisation de l'upload: ${completeResponse.status} - ${errorText}`);
+            }
+
+            setUploadProgress(prev => ({ ...prev, [fileKey]: 100 }));
+            setUploadStatus(`${file.name} uploadé avec succès !`);
+            console.log('🎉 Upload terminé avec succès pour:', file.name);
+
+            return fileId;
+        } catch (error) {
+            console.error('Erreur upload S3:', error);
+            setUploadStatus(`Erreur lors de l'upload de ${file.name}`);
+            throw error;
+        }
+    };
+
+    // Fonction de test pour vérifier la connectivité API
+    const testApiConnectivity = async (testFileName = "test.pdf") => {
+        try {
+            console.log('🔍 Test de connectivité API...');
+            const testResponse = await fetchWithoutAuth('/edrm-storage/files/init', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    originalName: testFileName,
+                    mimeType: "application/pdf",
+                    size: 2097152,
+                    tenantId: "endurance-internal",
+                    entityName: "job-application",
+                    entityId: `application-${Date.now()}`
+                })
+            });
+            console.log('✅ API accessible:', testResponse.status);
+            return testResponse.ok;
+        } catch (error) {
+            console.error('❌ API non accessible:', error);
+            return false;
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSubmitting(true);
 
         try {
-            const formData = new FormData();
-
-            // Ajouter les champs du formulaire
-            formData.append('firstname', (e.currentTarget.firstName as HTMLInputElement).value);
-            formData.append('lastname', (e.currentTarget.lastName as HTMLInputElement).value);
-            formData.append('email', (e.currentTarget.email as HTMLInputElement).value);
-            formData.append('phone', (e.currentTarget.phone as HTMLInputElement).value);
-            formData.append('linkedin', (e.currentTarget.linkedin as HTMLInputElement).value);
-            formData.append('message', (e.currentTarget.message as HTMLTextAreaElement).value);
-            formData.append('city', job?.location || '');
-
-            // Ajouter les fichiers
+            // Test de connectivité avant de commencer
+            const isApiAccessible = await testApiConnectivity();
+            if (!isApiAccessible) {
+                throw new Error('API non accessible. Vérifiez votre connexion et la configuration.');
+            }
+            // Upload des fichiers vers S3 et récupération des IDs
+            const uploadedFileIds: string[] = [];
+            
             if (files.length > 0) {
-                files.forEach(file => {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
                     if (file instanceof File) {
-                        formData.append('documents', file);
+                        const fileId = await uploadFileToS3(file, i);
+                        uploadedFileIds.push(fileId);
                     }
-                });
+                }
             }
 
+            // Préparer les données de candidature
+            const applicationData = {
+                firstname: (e.currentTarget.firstName as HTMLInputElement).value,
+                lastname: (e.currentTarget.lastName as HTMLInputElement).value,
+                email: (e.currentTarget.email as HTMLInputElement).value,
+                phone: (e.currentTarget.phone as HTMLInputElement).value,
+                linkedin: (e.currentTarget.linkedin as HTMLInputElement).value,
+                message: (e.currentTarget.message as HTMLTextAreaElement).value,
+                city: job?.location || '',
+                documentIds: uploadedFileIds // IDs des fichiers uploadés vers S3
+            };
+
+            // Envoyer la candidature avec les IDs des fichiers
             const response = await fetchWithoutAuth(`/job/${params.id}/apply`, {
                 method: 'POST',
-                body: formData,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(applicationData),
             });
 
             if (!response.ok) {
@@ -138,9 +298,12 @@ export default function JobDetailPage() {
             // Réinitialiser le formulaire avant de changer l'état
             formRef.current?.reset();
             setFiles([]);
+            setUploadProgress({});
+            setUploadStatus('');
             setIsSuccess(true);
         } catch (error) {
-            console.error('Erreur:', error);
+            console.error('❌ Erreur globale:', error);
+            setUploadStatus(`Erreur: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
             // TODO: Ajouter une notification d'erreur
         } finally {
             setIsSubmitting(false);
@@ -458,6 +621,30 @@ export default function JobDetailPage() {
                                                 {isSubmitting ? 'Envoi en cours...' : 'Envoyer ma candidature'}
                                             </Button>
                                         </div>
+                                        {/* Indicateur de progression d'upload */}
+                                        {isSubmitting && files.length > 0 && (
+                                            <div className="mt-4 space-y-2">
+                                                <div className="text-sm text-gray-600">{uploadStatus}</div>
+                                                {files.map((file, index) => {
+                                                    const fileKey = `${index}-${file.name}`;
+                                                    const progress = uploadProgress[fileKey] || 0;
+                                                    return (
+                                                        <div key={fileKey} className="space-y-1">
+                                                            <div className="flex justify-between text-xs text-gray-500">
+                                                                <span>{file.name}</span>
+                                                                <span>{progress}%</span>
+                                                            </div>
+                                                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                                                <div 
+                                                                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                                                    style={{ width: `${progress}%` }}
+                                                                ></div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
                                     </form>
                                 </div>
                                 <div className={isSuccess ? 'block' : 'hidden'}>
