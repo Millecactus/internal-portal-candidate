@@ -127,6 +127,7 @@ export default function JobsPage() {
                                             <SelectItem value="all">Tous</SelectItem>
                                             <SelectItem value="CDI">CDI</SelectItem>
                                             <SelectItem value="CDD">CDD</SelectItem>
+                                            <SelectItem value="APPRENTICESHIP">Alternance</SelectItem>
                                             <SelectItem value="STAGE">Stage</SelectItem>
                                         </SelectContent>
                                     </Select>

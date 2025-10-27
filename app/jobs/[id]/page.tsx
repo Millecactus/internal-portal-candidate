@@ -241,7 +241,9 @@ export default function JobDetailPage() {
                                                 ? "Il s'agit d'un poste en sous-traitance (Freelance)"
                                                 : job?.contractType === 'STAGE'
                                                     ? "Il s'agit d'un stage."
-                                                    : "Information non renseignée."
+                                                    : job?.contractType === 'APPRENTICESHIP'
+                                                        ? "Il s'agit d'un alternance."
+                                                        : "Information non renseignée."
                                 },
                                 {
                                     question: "Une lettre de motivation est-elle obligatoire pour postuler à cette offre ?",
