@@ -1,22 +1,36 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
 import { fetchWithoutAuth } from "@/lib/api-request-utils";
-import katex from "katex";
-import "katex/dist/katex.min.css";
-import CodeMirror from '@uiw/react-codemirror';
-import { php } from '@codemirror/lang-php';
-import { javascript } from '@codemirror/lang-javascript';
-import { python } from '@codemirror/lang-python';
-import { java } from '@codemirror/lang-java';
 import { cpp } from '@codemirror/lang-cpp';
+import { java } from '@codemirror/lang-java';
+import { javascript } from '@codemirror/lang-javascript';
 import { markdown } from '@codemirror/lang-markdown';
+import { php } from '@codemirror/lang-php';
+import { python } from '@codemirror/lang-python';
 import { sql } from '@codemirror/lang-sql';
 import { csharp } from '@replit/codemirror-lang-csharp';
+import CodeMirror from '@uiw/react-codemirror';
+import katex from "katex";
+import "katex/dist/katex.min.css";
+import { ArrowRight } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+const LANGUAGE_KEYWORDS = [
+    { value: 'php', regex: /\bphp\b|<\?php/i },
+    { value: 'javascript', regex: /\bjavascript\b|\bjs\b|console\.log|function\s*\(/i },
+    { value: 'typescript', regex: /\btypescript\b|\bts\b/i },
+    { value: 'python', regex: /\bpython\b|\bpy\b|def |print\s*\(/i },
+    { value: 'java', regex: /\bjava\b|public\s+class|System\.out\.println/i },
+    { value: 'cpp', regex: /\bc\+\+\b|\bcpp\b|std::|#include\s*<iostream>/i },
+    { value: 'c', regex: /\bc\b|#include\s*<stdio.h>/i },
+    { value: 'sql', regex: /\bsql\b|SELECT |INSERT |UPDATE |DELETE |CREATE TABLE/i },
+    { value: 'markdown', regex: /\bmarkdown\b|# |\*\*|__|\[.*\]\(.*\)/i },
+    { value: 'csharp', regex: /\bc#\b|\bcsharp\b|using\s+System|Console\.WriteLine/i },
+    { value: 'dart', regex: /\bdart\b|void\s+main\s*\(|print\s*\(/i },
+];
 
 export default function TestQuestionPage() {
     const router = useRouter();
@@ -67,38 +81,17 @@ export default function TestQuestionPage() {
         return found && found.extension ? [found.extension()] : [];
     }, [selectedLanguage, codeLanguages]);
 
-    // Détection automatique du langage dans l'énoncé
+    // Détection automatique du langage dans l'énoncé (au chargement de la question)
     useEffect(() => {
-        if (question && question.textType === 'code' && question.instruction) {
-            // Liste des mots-clés et alias pour chaque langage
-            const langKeywords = [
-                { value: 'php', regex: /\bphp\b|<\?php/i },
-                { value: 'javascript', regex: /\bjavascript\b|\bjs\b|console\.log|function\s*\(/i },
-                { value: 'typescript', regex: /\btypescript\b|\bts\b/i },
-                { value: 'python', regex: /\bpython\b|\bpy\b|def |print\s*\(/i },
-                { value: 'java', regex: /\bjava\b|public\s+class|System\.out\.println/i },
-                { value: 'cpp', regex: /\bc\+\+\b|\bcpp\b|std::|#include\s*<iostream>/i },
-                { value: 'c', regex: /\bc\b|#include\s*<stdio.h>/i },
-                { value: 'sql', regex: /\bsql\b|SELECT |INSERT |UPDATE |DELETE |CREATE TABLE/i },
-                { value: 'markdown', regex: /\bmarkdown\b|# |\*\*|__|\[.*\]\(.*\)/i },
-                { value: 'csharp', regex: /\bc#\b|\bcsharp\b|using\s+System|Console\.WriteLine/i },
-                { value: 'dart', regex: /\bdart\b|void\s+main\s*\(|print\s*\(/i },
-            ];
-            const found = langKeywords.find(lang => lang.regex.test(question.instruction));
-            if (found) {
-                // Mappe les alias secondaires vers la valeur attendue
-                let langValue = found.value;
-                if (langValue === 'cpp') langValue = 'cpp';
-                if (langValue === 'csharp') langValue = 'csharp';
-                if (langValue === 'js') langValue = 'javascript';
-                if (langValue === 'ts') langValue = 'typescript';
-                if (langValue === 'py') langValue = 'python';
-                if (langValue !== selectedLanguage) {
-                    setSelectedLanguage(langValue);
-                }
-            }
+        if (!question || question.textType !== 'code') {
+            return;
         }
-    }, [question, selectedLanguage]);
+        const detectedLanguage = question.instruction
+            ? LANGUAGE_KEYWORDS.find(lang => lang.regex.test(question.instruction))?.value
+            : undefined;
+        const nextLanguage = detectedLanguage || 'php';
+        setSelectedLanguage((prev) => (prev === nextLanguage ? prev : nextLanguage));
+    }, [question]);
 
     const handleSubmit = useCallback(async () => {
         // Nettoyage du timer dans le localStorage
